@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class ApiServiceService {
   private apiUrl = 'http://localhost:8080/traducciones';
-  private translationApiUrl = 'https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&from=en&to=es';
+  private translationApiUrl = 'https://api.cognitive.microsofttranslator.com/translate?api-version=3.0';
   private translationApiKey = 'b328c314264746f885a937ada7680e72';
   private translationLocation = 'eastus';
 
@@ -25,15 +25,16 @@ export class ApiServiceService {
     return this.http.get<any[]>(`${this.apiUrl}/inactive`);
   }
 
-  traducirPalabra(palabra: string): Observable<any> {
+  traducirPalabra(palabra: string, idiomaDestino: string): Observable<any> {
     const headers = new HttpHeaders()
       .set('Ocp-Apim-Subscription-Key', this.translationApiKey)
       .set('Ocp-Apim-Subscription-Region', this.translationLocation)
       .set('Content-Type', 'application/json');
 
     const body = [{ 'Text': palabra }];
+    const url = `${this.translationApiUrl}&from=es&to=${idiomaDestino}`;
 
-    return this.http.post<any>(this.translationApiUrl, body, { headers });
+    return this.http.post<any>(url, body, { headers });
   }
 
   guardarTraduccion(palabraOriginal: string, palabra_traducida: string): Observable<any> {

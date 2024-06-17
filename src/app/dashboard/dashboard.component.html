@@ -6,13 +6,15 @@
     <div class="card-body p-4">
         <!-- Title -->
         <span class="fs-6">Traducciones</span>
-        <p class="mb-2"><span class="h2 me-2">Acuerdos de equipo</span>
-        </p>
+        <p class="mb-2"><span class="h2 me-2">Acuerdos de equipo</span></p>
 
         <div class="input-group mb-4">
-            <input type="text" class="form-control" placeholder="Traducir Palabra de ingles a español"
-                aria-label="Traducir Palabra de ingles a español" aria-describedby="btn-add-task"
+            <input type="text" class="form-control" placeholder="Traducir Palabra de inglés a español"
+                aria-label="Traducir Palabra de inglés a español" aria-describedby="btn-add-task"
                 [(ngModel)]="palabra_ingresada">
+            <select class="form-select" [(ngModel)]="idiomaSeleccionado">
+                <option *ngFor="let idioma of idiomas" [value]="idioma.codigo">{{ idioma.nombre }}</option>
+            </select>
             <button class="btn btn-primary" type="button" id="btn-add-task"
                 (click)="traducirPalabra()">Traducir</button>
         </div>
@@ -51,17 +53,18 @@
                         traduccion.palabra_traducida }}
                     </div>
                     <div>
-                        <!-- Mostrar botones según el estado de la traducción -->
                         <ng-container *ngIf="traduccion.estado === 'A'; else inactivoTpl">
                             <button class="btn btn-warning" (click)="openEditModal(traduccion)">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn btn-danger" (click)="eliminarTraduccionLogica(traduccion.id_traducciones_guardadas)">
+                            <button class="btn btn-danger"
+                                (click)="eliminarTraduccionLogica(traduccion.id_traducciones_guardadas)">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </ng-container>
                         <ng-template #inactivoTpl>
-                            <button class="btn btn-success" (click)="reactivarTraduccion(traduccion.id_traducciones_guardadas)">
+                            <button class="btn btn-success"
+                                (click)="reactivarTraduccion(traduccion.id_traducciones_guardadas)">
                                 <i class="fas fa-undo-alt"></i>
                             </button>
                         </ng-template>
@@ -69,7 +72,6 @@
                 </li>
             </ul>
         </div>
-        
 
         <div *ngIf="vistaActual === 'activos'">
             <ul class="list-group mb-0" *ngIf="traducciones.length > 0; else notDataTpl">
@@ -137,7 +139,17 @@
                             <div class="form-group">
                                 <label for="palabraIngresada">Palabra Ingresada</label>
                                 <input type="text" class="form-control" id="palabraIngresada"
-                                    [(ngModel)]="modalTraduccion.palabra_ingresada" name="palabra_ingresada" (input)="traducirPalabraParaEdicion(modalTraduccion.palabra_ingresada)" required>
+                                    [(ngModel)]="modalTraduccion.palabra_ingresada" name="palabra_ingresada"
+                                    (input)="traducirPalabraParaEdicion(modalTraduccion.palabra_ingresada)" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="idiomaSeleccionado">Idioma</label>
+                                <select class="form-select" id="idiomaSeleccionado" [(ngModel)]="modalTraduccion.idioma"
+                                    name="idioma"
+                                    (change)="traducirPalabraParaEdicion(modalTraduccion.palabra_ingresada)">
+                                    <option *ngFor="let idioma of idiomas" [value]="idioma.codigo">{{ idioma.nombre }}
+                                    </option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="palabraTraducida">Palabra Traducida</label>
@@ -155,6 +167,9 @@
             </div>
         </div>
 
+
+
+
         <!-- Modal de Eliminacion -->
         <div *ngIf="isDeletedModalOpen">
             <div class="modal fade show" tabindex="-1" role="dialog"
@@ -169,8 +184,8 @@
                         <div class="modal-body text-center">
                             <img src="https://cdn-icons-png.flaticon.com/512/463/463612.png" class="img-fluid"
                                 style="max-width: 100px;">
-                            <p class="mt-3">¿Estás seguro de que deseas eliminar esta traducción? Esta acción no se puede
-                                deshacer.</p>
+                            <p class="mt-3">¿Estás seguro de que deseas eliminar esta traducción? Esta acción no se
+                                puede deshacer.</p>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
@@ -181,6 +196,5 @@
                 </div>
             </div>
         </div>
-
     </div>
 </div>

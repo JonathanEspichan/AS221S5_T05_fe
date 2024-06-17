@@ -17,6 +17,64 @@ export class DashboardComponent implements OnInit {
   isEditModalOpen: boolean = false;
   isDeletedModalOpen: boolean = false;
   modalTraduccion: any;
+  idiomas: { codigo: string, nombre: string }[] = [
+    { codigo: 'af', nombre: 'Afrikáans' },
+    { codigo: 'ar', nombre: 'Árabe' },
+    { codigo: 'bn', nombre: 'Bengalí' },
+    { codigo: 'bg', nombre: 'Búlgaro' },
+    { codigo: 'ca', nombre: 'Catalán' },
+    { codigo: 'zh-Hans', nombre: 'Chino Simplificado' },
+    { codigo: 'zh-Hant', nombre: 'Chino Tradicional' },
+    { codigo: 'hr', nombre: 'Croata' },
+    { codigo: 'cs', nombre: 'Checo' },
+    { codigo: 'da', nombre: 'Danés' },
+    { codigo: 'nl', nombre: 'Holandés' },
+    { codigo: 'en', nombre: 'Inglés' },
+    { codigo: 'et', nombre: 'Estonio' },
+    { codigo: 'fi', nombre: 'Finlandés' },
+    { codigo: 'fr', nombre: 'Francés' },
+    { codigo: 'de', nombre: 'Alemán' },
+    { codigo: 'el', nombre: 'Griego' },
+    { codigo: 'gu', nombre: 'Guyaratí' },
+    { codigo: 'he', nombre: 'Hebreo' },
+    { codigo: 'hi', nombre: 'Hindi' },
+    { codigo: 'hu', nombre: 'Húngaro' },
+    { codigo: 'is', nombre: 'Islandés' },
+    { codigo: 'id', nombre: 'Indonesio' },
+    { codigo: 'it', nombre: 'Italiano' },
+    { codigo: 'ja', nombre: 'Japonés' },
+    { codigo: 'kn', nombre: 'Canarés' },
+    { codigo: 'ko', nombre: 'Coreano' },
+    { codigo: 'lv', nombre: 'Letón' },
+    { codigo: 'lt', nombre: 'Lituano' },
+    { codigo: 'ms', nombre: 'Malayo' },
+    { codigo: 'ml', nombre: 'Malayalam' },
+    { codigo: 'mt', nombre: 'Maltés' },
+    { codigo: 'mr', nombre: 'Marathi' },
+    { codigo: 'nb', nombre: 'Noruego' },
+    { codigo: 'fa', nombre: 'Persa' },
+    { codigo: 'pl', nombre: 'Polaco' },
+    { codigo: 'pt', nombre: 'Portugués' },
+    { codigo: 'pa', nombre: 'Punjabi' },
+    { codigo: 'ro', nombre: 'Rumano' },
+    { codigo: 'ru', nombre: 'Ruso' },
+    { codigo: 'sr', nombre: 'Serbio' },
+    { codigo: 'sk', nombre: 'Eslovaco' },
+    { codigo: 'sl', nombre: 'Esloveno' },
+    { codigo: 'es', nombre: 'Español' },
+    { codigo: 'sw', nombre: 'Swahili' },
+    { codigo: 'sv', nombre: 'Sueco' },
+    { codigo: 'ta', nombre: 'Tamil' },
+    { codigo: 'te', nombre: 'Telugu' },
+    { codigo: 'th', nombre: 'Tailandés' },
+    { codigo: 'tr', nombre: 'Turco' },
+    { codigo: 'uk', nombre: 'Ucraniano' },
+    { codigo: 'ur', nombre: 'Urdu' },
+    { codigo: 'vi', nombre: 'Vietnamita' },
+    { codigo: 'cy', nombre: 'Galés' },
+    // Agrega más idiomas según tus necesidades
+  ];
+  idiomaSeleccionado: string = 'es';
 
   constructor(private apiService: ApiServiceService) { }
 
@@ -27,6 +85,7 @@ export class DashboardComponent implements OnInit {
 
   openEditModal(traduccion: any) {
     this.modalTraduccion = { ...traduccion };
+    this.idiomaSeleccionado = this.modalTraduccion.idioma; // Si idioma es parte de traduccion
     this.traducirPalabraParaEdicion(this.modalTraduccion.palabra_ingresada);
     this.isEditModalOpen = true;
   }
@@ -96,13 +155,14 @@ export class DashboardComponent implements OnInit {
   }
 
   traducirPalabra() {
-    this.apiService.traducirPalabra(this.palabra_ingresada).subscribe(
+    this.apiService.traducirPalabra(this.palabra_ingresada, this.idiomaSeleccionado).subscribe(
       response => {
         this.palabra_traducida = response[0].translations[0].text;
         this.apiService.guardarTraduccion(this.palabra_ingresada, this.palabra_traducida).subscribe(
           data => {
             this.cargarVistaActual();
             Swal.fire('Éxito', 'Traducción guardada con éxito', 'success');
+            this.limpiarCampos(); // Limpiar los campos después de guardar
           },
           error => {
             console.error('Error al guardar la traducción:', error);
@@ -117,8 +177,17 @@ export class DashboardComponent implements OnInit {
     );
   }
 
+  limpiarCampos() {
+    this.palabra_ingresada = '';
+    this.palabra_traducida = '';
+  }
+
   traducirPalabraParaEdicion(palabra: string) {
-    this.apiService.traducirPalabra(palabra).subscribe(
+    if (!palabra || !this.modalTraduccion.idioma) {
+      return;
+    }
+  
+    this.apiService.traducirPalabra(palabra, this.modalTraduccion.idioma).subscribe(
       response => {
         this.modalTraduccion.palabra_traducida = response[0].translations[0].text;
       },
@@ -128,6 +197,7 @@ export class DashboardComponent implements OnInit {
       }
     );
   }
+
 
   guardarCambios() {
     this.apiService.actualizarTraduccion(
@@ -186,7 +256,6 @@ export class DashboardComponent implements OnInit {
       }
     );
   }
-
 
   actualizarFechaYHora() {
     setInterval(() => {
